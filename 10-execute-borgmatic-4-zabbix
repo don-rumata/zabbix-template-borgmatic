@@ -1,0 +1,10 @@
+# https://andreyex.ru/operacionnaya-sistema-linux/kak-redaktirovat-fajl-sudoers-na-ubuntu-i-centos/
+# Всё что ниже - синтаксический сахар на то, что выше.
+
+# https://github.com/don-rumata/zabbix-template-borgmatic/
+
+User_Alias GROUP_EXECUTE_BORGMATIC_WITHOUT_PASSWORD = zabbix
+
+Cmnd_Alias EXECUTE_BORGMATIC = /usr/bin/borgmatic
+
+GROUP_EXECUTE_BORGMATIC_WITHOUT_PASSWORD ALL=(ALL) NOPASSWD: EXECUTE_BORGMATIC

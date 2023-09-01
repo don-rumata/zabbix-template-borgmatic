@@ -1,0 +1,503 @@
+---
+zabbix_export:
+  version: "6.0"
+  groups:
+    - name: Linux servers
+      uuid: dc579cd7a1a34222933f24f52a68bcd8
+  templates:
+    - uuid: f48e178e298d4b4081c9fbbc2cd67e91
+      template: Borgmatic linux backup
+      name: Borgmatic linux backup
+      description: |
+        Borgmatic json output monitor
+        https://github.com/don-rumata/zabbix-template-borgmatic
+      groups:
+        - name: Linux servers
+      items:
+
+        # TODO
+        # # Borgmatic list
+        # - uuid: d30d66def4554177a671dfbc9370b91f
+        #   name: borgmatic-list
+        #   key: backup.borg.borgmatic.list
+        #   trends: '0'
+        #   delay: 15s
+        #   history: 1d
+        #   value_type: TEXT
+
+        # Borgmatic info
+        - uuid: e9d5348a561141d3b483b6ed6c5ea3a8
+          name: borgmatic-info
+          key: backup.borg.borgmatic.info
+          trends: '0'
+          delay: 15s
+          history: 1d
+          value_type: TEXT
+          triggers:
+            - uuid: a6913b25b9a045ee90d1e3670986edd6
+              expression: 'find(/Borgmatic linux backup/backup.borg.borgmatic.info,60s,"like","No configuration files found")=1'
+              name: Borgmatic config not found
+              # https://www.zabbix.com/documentation/6.0/en/manual/config/triggers/severity
+              # priority: INFO
+              priority: WARNING
+              # priority: AVERAGE
+              # priority: HIGH
+              # priority: DISASTER
+
+        - uuid: 32a493cc6c7349e88bfd0748ce8bc04a
+          name: Borgmatic cache stats total_chunks
+          type: DEPENDENT
+          key: cache.stats.total_chunks
+          trends: '365d'
+          history: 100d
+          value_type: UNSIGNED
+          preprocessing:
+            - parameters:
+                - '$[*].cache.stats.total_chunks.first()'
+              type: JSONPATH
+          master_item:
+            key: backup.borg.borgmatic.info
+
+        - uuid: 340e3c15a8004eab8606ffa22c14b5c5
+          name: Borgmatic cache stats total_csize
+          type: DEPENDENT
+          key: cache.stats.total_csize
+          trends: '365d'
+          history: 100d
+          units: B
+          value_type: UNSIGNED
+          preprocessing:
+            - parameters:
+                - '$[*].cache.stats.total_csize.first()'
+              type: JSONPATH
+          master_item:
+            key: backup.borg.borgmatic.info
+
+        - uuid: 5aef2d5e154d4cd4b284d294d046ddf2
+          name: Borgmatic cache stats total_size
+          type: DEPENDENT
+          key: cache.stats.total_size
+          trends: '365d'
+          history: 100d
+          units: B
+          value_type: UNSIGNED
+          preprocessing:
+            - parameters:
+                - '$[*].cache.stats.total_size.first()'
+              type: JSONPATH
+          master_item:
+            key: backup.borg.borgmatic.info
+
+        - uuid: 50a8b0ef6e964de58e2e6bf3f74650e5
+          name: Borgmatic cache stats total_unique_chunks
+          type: DEPENDENT
+          key: cache.stats.total_unique_chunks
+          trends: '365d'
+          history: 100d
+          value_type: UNSIGNED
+          preprocessing:
+            - parameters:
+                - '$[*].cache.stats.total_unique_chunks.first()'
+              type: JSONPATH
+          master_item:
+            key: backup.borg.borgmatic.info
+
+        - uuid: c7ccef7b78db48fc8532ce8d3ba6f7f7
+          name: Borgmatic cache stats unique_csize
+          type: DEPENDENT
+          key: cache.stats.unique_csize
+          trends: '365d'
+          history: 100d
+          units: B
+          value_type: UNSIGNED
+          preprocessing:
+            - parameters:
+                - '$[*].cache.stats.unique_csize.first()'
+              type: JSONPATH
+          master_item:
+            key: backup.borg.borgmatic.info
+
+        - uuid: 53835a0373a645e5a3382867c19bc2c9
+          name: Borgmatic cache stats unique_size
+          type: DEPENDENT
+          key: cache.stats.unique_size
+          trends: '365d'
+          history: 100d
+          units: B
+          value_type: UNSIGNED
+          preprocessing:
+            - parameters:
+                - '$[*].cache.stats.unique_size.first()'
+              type: JSONPATH
+          master_item:
+            key: backup.borg.borgmatic.info
+
+        - uuid: 6a45c426c7d045abb42eca6e5d74f179
+          name: Borgmatic repository id
+          type: DEPENDENT
+          key: repository.id
+          trends: '0'
+          history: 100d
+          value_type: TEXT
+          preprocessing:
+            - parameters:
+                - '$[*].repository.id.first()'
+              type: JSONPATH
+          master_item:
+            key: backup.borg.borgmatic.info
+
+        - uuid: cad39aa6671549218ea14f65458db122
+          name: Borgmatic repository last_modified
+          type: DEPENDENT
+          key: repository.last_modified
+          trends: '0'
+          history: 100d
+          units: unixtime
+          # NOT FUCKING WORK!
+          # TODO. Send error about https://www.zabbix.com/documentation/6.0/en/manual/config/items/item
+          # value_type: UNSIGNED
+          value_type: TEXT
+          preprocessing:
+            - parameters:
+                - '$[*].repository.last_modified.first()'
+              type: JSONPATH
+            - parameters:
+                - 'T'
+                - ' '
+              type: STR_REPLACE
+            - parameters:
+                - '-'
+                - '.'
+              type: STR_REPLACE
+            # TODO. Подумать над регуляркой "начиная с точки и до конца строки".
+            - parameters:
+                - '.000000'
+              type: RTRIM
+          master_item:
+            key: backup.borg.borgmatic.info
+
+        - uuid: 48c271bb06264e27bf337907d84d8f5c
+          name: Borgmatic repository location
+          type: DEPENDENT
+          key: repository.location
+          trends: '0'
+          history: 100d
+          value_type: TEXT
+          preprocessing:
+            - parameters:
+                # - '$[*].repository.location.first()'
+                - '$[*].repository.location'
+              type: JSONPATH
+          master_item:
+            key: backup.borg.borgmatic.info
+
+
+
+        # # 4 TEST and debug
+        # - uuid: 4b5a260e98fc408a9a4eb6d39eb28c1f
+        #   name: AAA
+        #   key: aaa
+        #   delay: 15s
+        #   trends: '0'
+        #   value_type: TEXT
+        # - uuid: baecd4fbe6454177b24dfce61c11e1d2
+        #   name: 'AAA BBB'
+        #   type: DEPENDENT
+        #   key: body.StatusSNS.AM2301.Temperature
+        #   units: celsios
+        #   trends: '0'
+        #   # value_type: TEXT
+        #   value_type: UNSIGNED
+        #   preprocessing:
+        #     - type: JSONPATH
+        #       parameters:
+        #         - $.body.StatusSNS.AM2301.Temperature
+        #   master_item:
+        #     key: aaa
+
+      tags:
+        - tag: backup
+        - tag: borg
+        - tag: borgmatic
+
+      dashboards:
+
+        - uuid: 2781dc5b80d74ab4bf4adc49cd6f0dc3
+          name: Borgmatic panel
+          pages:
+            - widgets:
+                - type: ITEM
+                  name: Borgmatic repository cache stats total_chunks
+                  width: '8'
+                  x: '0'
+                  y: '0'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: Borgmatic linux backup
+                        key: cache.stats.total_chunks
+
+                - type: ITEM
+                  name: Borgmatic repository cache stats total_csize
+                  width: '8'
+                  x: '8'
+                  y: '0'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: Borgmatic linux backup
+                        key: cache.stats.total_csize
+
+                - type: ITEM
+                  name: Borgmatic repository cache stats total_size
+                  width: '8'
+                  x: '16'
+                  y: '0'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: Borgmatic linux backup
+                        key: cache.stats.total_size
+
+                - type: ITEM
+                  name: Borgmatic repository cache stats total_unique_chunks
+                  width: '8'
+                  x: '0'
+                  y: '2'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: Borgmatic linux backup
+                        key: cache.stats.total_unique_chunks
+
+                - type: ITEM
+                  name: Borgmatic repository cache stats unique_csize
+                  width: '8'
+                  x: '8'
+                  y: '2'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: Borgmatic linux backup
+                        key: cache.stats.unique_csize
+
+                - type: ITEM
+                  name: Borgmatic repository cache stats unique_size
+                  width: '8'
+                  x: '16'
+                  y: '2'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: Borgmatic linux backup
+                        key: cache.stats.unique_size
+
+                - type: ITEM
+                  name: Borgmatic repository id
+                  width: '8'
+                  x: '0'
+                  y: '4'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: Borgmatic linux backup
+                        key: repository.id
+
+                - type: ITEM
+                  name: Borgmatic repository last_modified
+                  width: '8'
+                  x: '8'
+                  y: '4'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: Borgmatic linux backup
+                        key: repository.last_modified
+
+                - type: ITEM
+                  name: Borgmatic repository location
+                  width: '8'
+                  x: '16'
+                  y: '4'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: Borgmatic linux backup
+                        key: repository.location
+
+  graphs:
+
+    - uuid: 892ff18c91b64bfcaa14cc70903570ac
+      name: Borgmatic chunks
+      graph_items:
+        - color: 199C0D
+          calc_fnc: ALL
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.total_chunks
+        - sortorder: '1'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.total_unique_chunks
+
+    - uuid: 6ed6934c4df74a4cb0e7d68c7c12de8f
+      name: Borgmatic repo size
+      graph_items:
+        - color: 199C0D
+          calc_fnc: ALL
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.total_csize
+        - sortorder: '1'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: 'Borgmatic linux backup'
+            key: cache.stats.total_size
+        - sortorder: '2'
+          color: 2774A4
+          calc_fnc: ALL
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.unique_csize
+        - sortorder: '3'
+          color: F7941D
+          calc_fnc: ALL
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.unique_size
+
+    - uuid: 01b029cb192b47ad842e223c21a180f7
+      name: Borgmatic chunks pie
+      yaxismax: '0'
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: PIE
+      show_3d: 'YES'
+      graph_items:
+        - color: 199C0D
+          calc_fnc: MIN
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.total_chunks
+        - sortorder: '1'
+          color: F63100
+          calc_fnc: MIN
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.total_unique_chunks
+
+    - uuid: 1c7be1c1b436466396b5ad84e0a07066
+      name: Borgmatic repo size pie
+      yaxismax: '0'
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: PIE
+      show_3d: 'YES'
+      graph_items:
+        - color: 199C0D
+          calc_fnc: MIN
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.total_csize
+        - sortorder: '1'
+          color: F63100
+          calc_fnc: MIN
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.total_size
+        - sortorder: '2'
+          color: 2774A4
+          calc_fnc: MIN
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.unique_csize
+        - sortorder: '3'
+          color: F7941D
+          calc_fnc: MIN
+          item:
+            host: Borgmatic linux backup
+            key: cache.stats.unique_size
+
+    # - uuid: 825dd1e5570242f6895fd366cb7a57c0
+    #   name: 'graph aaa bbb'
+    #   graph_items:
+    #     - color: 199C0D
+    #       calc_fnc: ALL
+    #       item:
+    #         host: Borgmatic linux backup
+    #         key: body.StatusSNS.AM2301.Temperature
+
+    # - uuid: 13b1b91a61ed4abfb73332a11be9afbc
+    #   name: Borgmatic cache.stats.total_chunks
+    #   graph_items:
+    #     - color: 199C0D
+    #       calc_fnc: ALL
+    #       item:
+    #         host: Borgmatic linux backup
+    #         key: cache.stats.total_chunks
+
+    # - uuid: 8a297cf3b7ea4ceea8f003d88b1d6e47
+    #   name: Borgmatic cache.stats.total_csize
+    #   graph_items:
+    #     - color: 199C0D
+    #       calc_fnc: ALL
+    #       item:
+    #         host: Borgmatic linux backup
+    #         key: cache.stats.total_csize
+
+    # - uuid: b548a04105274eb69dbb235b1ff4556f
+    #   name: Borgmatic cache.stats.total_size
+    #   graph_items:
+    #     - color: 199C0D
+    #       calc_fnc: ALL
+    #       item:
+    #         host: Borgmatic linux backup
+    #         key: cache.stats.total_size
+
+    # - uuid: 4ead1a4bd92147cab152d0d7d96c2f86
+    #   name: Borgmatic cache.stats.total_unique_chunks
+    #   graph_items:
+    #     - color: 199C0D
+    #       calc_fnc: ALL
+    #       item:
+    #         host: Borgmatic linux backup
+    #         key: cache.stats.total_unique_chunks
+
+    # - uuid: 6dd84b61846f48109dada4804de8527d
+    #   name: Borgmatic cache.stats.unique_csize
+    #   graph_items:
+    #     - color: 199C0D
+    #       calc_fnc: ALL
+    #       item:
+    #         host: Borgmatic linux backup
+    #         key: cache.stats.unique_csize
+
+    # - uuid: 76d74740fe00450487038572112e1981
+    #   name: Borgmatic cache.stats.unique_size
+    #   graph_items:
+    #     - color: 199C0D
+    #       calc_fnc: ALL
+    #       item:
+    #         host: Borgmatic linux backup
+    #         key: cache.stats.unique_size
+
+    # - uuid: 6d3c4a214eea40349cc43a09a3d06070
+    #   name: Borgmatic repository.last_modified
+    #   graph_items:
+    #     - color: 199C0D
+    #       calc_fnc: ALL
+    #       item:
+    #         host: Borgmatic linux backup
+    #         key: repository.last_modified
