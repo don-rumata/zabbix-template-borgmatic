@@ -74,8 +74,8 @@ Set your vars:
       register: zabbix_template_borgmatic_status
 
     - ansible.builtin.set_fact:
-       zabbix_template_borgmatic_fact:
-         "{{ zabbix_template_borgmatic_status.content | from_yaml }}"
+        zabbix_template_borgmatic_fact:
+          "{{ zabbix_template_borgmatic_status.content | from_yaml }}"
 
     - community.zabbix.zabbix_template:
         server_url: "{{ zabbix_server_url }}"
