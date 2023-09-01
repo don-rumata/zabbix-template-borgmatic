@@ -9,7 +9,8 @@ Monitor [Borgmatic](https://torsion.org/borgmatic/) backups with [Zabbix](https:
 - 2 `pie` diagrams for repo size in `chunks` and `bytes`.
 - 2 `normal` diagrams for repo size in `chunks` and `bytes`.
 - 1 dashboard with 9 panels: `sizes`, `location`, `repo id`, `last modified`.
-- `trigger` for a missing config.
+- 2 `triggers`: "missing config" and "borg is busy".
+- Checking information 2 times per hour: every 25 and 55 min (if your `borg` makes archives slowly).
 
 ## Requirements
 

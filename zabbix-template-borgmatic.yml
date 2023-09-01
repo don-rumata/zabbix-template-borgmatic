@@ -30,7 +30,7 @@ zabbix_export:
           name: borgmatic-info
           key: backup.borg.borgmatic.info
           trends: '0'
-          delay: 15s
+          delay: '0;m25,55'
           history: 1d
           value_type: TEXT
           triggers:
@@ -43,6 +43,10 @@ zabbix_export:
               # priority: AVERAGE
               # priority: HIGH
               # priority: DISASTER
+            - uuid: ccda0ccf2c6246f1bbbed3d599def439
+              expression: 'find(/Borgmatic linux backup/backup.borg.borgmatic.info,60s,"like","lock.exclusive (timeout)")=1'
+              name: Borgmatic is busy
+              priority: INFO
 
         - uuid: 32a493cc6c7349e88bfd0748ce8bc04a
           name: Borgmatic cache stats total_chunks
