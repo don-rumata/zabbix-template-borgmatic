@@ -25,7 +25,7 @@ Monitor [Borgmatic](https://torsion.org/borgmatic/) backups with [Zabbix](https:
 
 In zabbix server:
 
-- Get <https://github.com/don-rumata/zabbix-template-borgmatic/zabbix-template-borgmatic.yml>.
+- Get <https://raw.githubusercontent.com/don-rumata/zabbix-template-borgmatic/master/zabbix-template-borgmatic.yml>.
 - In web gui zabbix server: `Configuration` -> `Templates` -> `Import`.
 - Select file.
 - `Import`.
